@@ -116,13 +116,16 @@
       gap: 0;
     }
 
-    /* ── Hero logo ──────────────────────────────────────────── */
+    /* ── Nav logo ───────────────────────────────────────────── */
 
-    .hero-logo {
-      width: 96px;
-      height: 96px;
+    .nav-logo {
+      position: fixed;
+      top: 1.25rem;
+      left: 1.5rem;
+      width: 52px;
+      height: 52px;
       object-fit: contain;
-      margin-bottom: 1.5rem;
+      z-index: 10;
     }
 
     /* ── Heading ────────────────────────────────────────────── */
@@ -346,10 +349,10 @@
     </svg>
   </div>
 
+  <img src="logo.svg" alt="Epik Labs" class="nav-logo">
+
   <!-- Main content -->
   <main>
-    <img src="logo.svg" alt="Epik Labs" class="hero-logo">
-
     <h1>EPIK</h1>
 
     <p class="tagline">Building the future...</p>
