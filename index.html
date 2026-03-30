@@ -431,7 +431,10 @@
 
         const data = await res.json();
 
-        if (res.ok && data.success) {
+        if (res.ok && data.duplicate) {
+          msg.className = 'form-message success';
+          msg.textContent = "You're already on the waitlist!";
+        } else if (res.ok && data.success) {
           msg.className = 'form-message success';
           msg.textContent = "You're on the list! We'll be in touch.";
           form.reset();

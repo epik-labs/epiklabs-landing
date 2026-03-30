@@ -1,5 +1,6 @@
 const SPREADSHEET_ID = '1YMX3M7ay1uPARig12FmhchXyHrhVsvWVYrDo1X3HkZI';
 const SHEET_RANGE = 'Sheet1!A:B';
+const EMAIL_COLUMN = 'Sheet1!A:A';
 
 export default {
   async fetch(request, env) {
@@ -31,6 +32,18 @@ export default {
     }
 
     const timestamp = new Date().toISOString();
+
+    // Duplicate check
+    try {
+      const exists = await emailExistsInSheet(env, email);
+      if (exists) {
+        return json({ duplicate: true }, 200, request);
+      }
+    } catch (err) {
+      console.error('Duplicate check error:', err.message);
+      // Fall through and attempt to append — better to risk a duplicate than block a real signup
+    }
+
     const errors = [];
 
     try {
@@ -80,6 +93,28 @@ function json(body, status, request) {
 }
 
 // ── Google Sheets ─────────────────────────────────────────────────────────────
+
+async function emailExistsInSheet(env, email) {
+  const accessToken = await getGoogleAccessToken(env);
+
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}` +
+    `/values/${encodeURIComponent(EMAIL_COLUMN)}`;
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Sheets API ${res.status}: ${await res.text()}`);
+  }
+
+  const { values } = await res.json();
+  if (!values) return false;
+
+  const normalised = email.trim().toLowerCase();
+  return values.some(([cell]) => cell && cell.trim().toLowerCase() === normalised);
+}
 
 async function appendToSheet(env, email, timestamp) {
   const accessToken = await getGoogleAccessToken(env);
