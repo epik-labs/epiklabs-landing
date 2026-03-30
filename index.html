@@ -261,6 +261,31 @@
       transform: scale(0.97);
     }
 
+    /* ── Form feedback ──────────────────────────────────────── */
+
+    .form-message {
+      margin-top: 0.875rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      min-height: 1.2em;
+      display: none;
+    }
+
+    .form-message.success {
+      color: #6ee7b7;
+      display: block;
+    }
+
+    .form-message.error {
+      color: #fca5a5;
+      display: block;
+    }
+
+    .form-row button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     /* ── Footer ─────────────────────────────────────────────── */
 
     footer {
@@ -364,7 +389,7 @@
     <div class="waitlist-card">
       <h2>Join the Waitlist</h2>
       <p>Be the first to know when we launch.</p>
-      <form class="form-row" action="#" method="post">
+      <form class="form-row" id="waitlist-form">
         <input
           type="email"
           name="email"
@@ -374,10 +399,54 @@
         >
         <button type="submit">Notify Me</button>
       </form>
+      <p class="form-message" id="form-message" aria-live="polite"></p>
     </div>
   </main>
 
   <footer>&copy; 2026 Epik Labs</footer>
+
+  <script>
+    // Replace with your deployed Worker URL
+    const WORKER_URL = 'https://epiklabs-waitlist.epiklabs.workers.dev';
+
+    const form = document.getElementById('waitlist-form');
+    const msg = document.getElementById('form-message');
+    const btn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.email.value.trim();
+
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+      msg.className = 'form-message';
+      msg.textContent = '';
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          msg.className = 'form-message success';
+          msg.textContent = "You're on the list! We'll be in touch.";
+          form.reset();
+        } else {
+          throw new Error(data.error || 'Unexpected error');
+        }
+      } catch (err) {
+        msg.className = 'form-message error';
+        msg.textContent = err.message || 'Something went wrong. Please try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Notify Me';
+      }
+    });
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,9 @@
+name = "epiklabs-waitlist"
+main = "index.js"
+compatibility_date = "2024-09-23"
+account_id = "4b3258571dbc4b06fea5e65ca71351b1"
+
+# Secrets (set via `wrangler secret put`):
+#   GOOGLE_SERVICE_ACCOUNT_EMAIL  — service account client_email from credentials JSON
+#   GOOGLE_PRIVATE_KEY            — service account private_key (include -----BEGIN/END PRIVATE KEY----- lines)
+#   SLACK_WEBHOOK_URL             — incoming webhook URL from Slack app settings
